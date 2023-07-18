@@ -1,0 +1,251 @@
+pipeline {
+    agent any
+    options { ansiColor('xterm') }
+    environment {
+        AWS_ACCOUNT_ID                  = "700158924566"
+        AWS_REGION                      = "us-east-1"
+
+        IMAGE_NAME_APP                  = "legoiowebsite/production/webapp"
+        IMAGE_NAME_SERVER               = "legoiowebsite/production/webserver"
+
+        ECR_REPO_NAME_WEBAPP            = "legoiowebsite/production/webapp"
+        ECR_REPO_NAME_WEBSERVER         = "legoiowebsite/production/webserver"
+        ECR_REPO_URI_WEBAPP             = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME_WEBAPP}"
+        ECR_REPO_URI_WEBSERVER          = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME_WEBSERVER}"
+
+        SLACK_CHANNEL                   = "#jenkins-build"
+        HOSTED_ZONE                     = "" 
+        SUB_DOMAIN                      = ""        
+
+    }
+
+
+    stages {
+        
+        // clonning git repo
+        stage('Cloning Git') {
+            steps {
+                checkout scm
+                script {
+                    env.GIT_COMMIT = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                }
+
+            }
+        }
+
+
+
+        // checking values for ENV file
+        stage('check ENV_var') {
+            steps {
+                script {
+
+                    // prepare application configuratoin
+                    sh """
+                    CONFIG_PARAMETERS=\$(aws ssm  get-parameters-by-path \
+                      --path "/legoiowebsite-production/" \
+                      --query "Parameters[*].Name" \
+                      --region us-east-1 \
+                      --output text)
+                    """                    
+
+                }
+                script {
+                    slackSend channel: '#jenkins-build',
+                    color: 'good',
+                    message: "${currentBuild.fullDisplayName} ${STAGE_NAME} ${currentBuild.result}"            
+                }                
+
+            }
+
+        }
+
+
+        // building Docker image >> webapp
+        stage('Build & publish docker image webapp') {
+            steps{
+                script {
+
+                    sh '''
+                        set +x
+                        $(aws ecr get-login --no-include-email --region us-east-1)
+                        set -x
+
+                    '''                    
+
+                    // build image >> webapp
+                    sh "docker build -t ${IMAGE_NAME_APP}:${GIT_COMMIT} -f infra-v5/production/Dockerfile.webapp --no-cache ."
+
+                    sh "docker tag ${IMAGE_NAME_APP}:${GIT_COMMIT} ${ECR_REPO_URI_WEBAPP}:${GIT_COMMIT}"
+                    sh "docker tag ${IMAGE_NAME_APP}:${GIT_COMMIT} ${ECR_REPO_URI_WEBAPP}:latest"
+
+                    sh "docker push ${ECR_REPO_URI_WEBAPP}:${GIT_COMMIT}"
+                    sh "docker push ${ECR_REPO_URI_WEBAPP}:latest"
+
+
+                }                
+                script {
+                    sh 'echo i am test'
+                }
+                script {
+                    slackSend channel: '#jenkins-build',
+                    color: 'good',
+                    message: "${currentBuild.fullDisplayName} ${STAGE_NAME} ${currentBuild.result}"            
+                }                                
+            }
+        }
+
+
+
+        // building Docker image >> webserver
+        stage('Build & publish server image') {
+            steps{
+                script {
+
+                    // To delete volumes currently not being used by a running or stopped container
+                    // sh "docker system prune --all --force --volumes"
+
+                    // build image >> webserver
+                    sh "docker build -t ${IMAGE_NAME_SERVER}:${GIT_COMMIT} -f infra-v5/production/Dockerfile.webserver --no-cache ."
+
+                    sh "docker tag ${IMAGE_NAME_SERVER}:${GIT_COMMIT} ${ECR_REPO_URI_WEBSERVER}:${GIT_COMMIT}"
+                    sh "docker tag ${IMAGE_NAME_SERVER}:${GIT_COMMIT} ${ECR_REPO_URI_WEBSERVER}:latest"
+
+                    sh "docker push ${ECR_REPO_URI_WEBSERVER}:${GIT_COMMIT}"
+                    sh "docker push ${ECR_REPO_URI_WEBSERVER}:latest"
+
+
+                }                
+                script {
+                    sh 'echo im test sgain'
+                }
+                script {
+                    slackSend channel: '#jenkins-build',
+                    color: 'good',
+                    message: "${currentBuild.fullDisplayName} ${STAGE_NAME} ${currentBuild.result}"            
+                }                                                
+            }
+        }
+
+        
+
+        // performing database migrations
+        stage('databse migrations') {
+            steps{
+                script {
+
+                    String username_fname = 'admin'
+                    String username_lname = new Date().format("yyyyMMddHHmmss")
+                    String dynamicUsername = username_fname + username_lname
+                    
+                    // prepare application configuratoin
+                    sh """
+                        set +x
+                        DOCKER_EVN_FILE=.env
+                        CONFIG_PARAMETERS=\$(aws ssm  get-parameters-by-path \
+                          --path "/legoiowebsite-production/" \
+                          --query "Parameters[*].Name" \
+                          --region us-east-1 \
+                          --output text)
+
+                        for config in \$CONFIG_PARAMETERS; do
+                           env_value=\$(aws ssm get-parameter \
+                            --name "\$config" \
+                            --query "Parameter.Value" \
+                            --with-decryption  \
+                            --region us-east-1 \
+                            --output text)
+                            env_name=\${config##/*/}
+
+                           echo "\${env_name}=\${env_value}" >> \${DOCKER_EVN_FILE}
+                        done
+                        set -x
+                    """
+                    
+                    // -- setup docker-compose
+                    sh """curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-\$(uname -s)-\$(uname -m)" -o docker-compose"""
+                    sh "chmod +x docker-compose"
+                    sh "./docker-compose -f infra-v5/production/docker-compose.yml up -d"
+                    sh "./docker-compose -f infra-v5/production/docker-compose.yml config"
+
+                    // --- starting db migration commands
+                    sh "./docker-compose -f infra-v5/production/docker-compose.yml exec -T webapp019 python manage.py showmigrations"
+                    sh "./docker-compose -f infra-v5/production/docker-compose.yml exec -T webapp019 python manage.py makemigrations"
+                    sh "./docker-compose -f infra-v5/production/docker-compose.yml exec -T webapp019 python manage.py migrate"
+                    sh "./docker-compose -f infra-v5/production/docker-compose.yml exec -T webapp019 python manage.py showmigrations"
+                    // --- check for critial issues
+                    sh "./docker-compose -f infra-v5/production/docker-compose.yml exec -T webapp019 python manage.py check --deploy"
+                    // --- create superuser username=someusername
+                    // sh "./docker-compose -f infra-v5/production/docker-compose.yml exec -T webapp python manage.py create_superuser_command2 --username ${dynamicUsername} --noinput"
+                    
+                    // --- inspect docker containers
+                    // sh "docker logs production_webapp019_1"
+                    sh "docker ps -a"
+
+
+                }
+                script {
+                    sh 'echo i am some test message'
+                }
+                script {
+                    slackSend channel: '#jenkins-build',
+                    color: 'good',
+                    message: "${currentBuild.fullDisplayName} ${STAGE_NAME} ${currentBuild}"            
+                }                                                
+            }
+        }
+
+
+
+  
+
+
+    }
+
+
+    post {
+        failure {
+            script {
+                msg = "website >>> Build#${env.BUILD_NUMBER} ${STAGE_NAME} >>> failed"
+                colorCode = '#FF0000'
+                slackSend message: msg, color: colorCode, channel: "#jenkins-build"
+            }
+        }    
+    }
+
+
+}
+
+
+def notifyBuild(String buildStatus = 'started') {
+    // build status of null means successful
+    buildStatus =  buildStatus ?: 'successful'
+
+    // Default values
+    def mySlackChannel = "#jenkins-build"
+    def colorName = 'RED'
+    def colorCode = '#FF0000'
+    def subject = "BUILD${env.BUILD_NUMBER}: ${STAGE_NAME} ${buildStatus}"
+    
+    // Override default values based on build status
+    if (buildStatus == 'started') {
+        color = 'WHITE'
+        colorCode = '#FFFFFF'
+        stageRes = 'started'
+        msg = "${subject} ${stageRes}"        
+        slackSend (channel: mySlackChannel, color: colorCode, message: msg)
+    } else if (buildStatus == 'successful') {
+        color = 'WHITE'
+        colorCode = '#FFFFFF'
+        stageRes = 'successful'
+        msg = "${subject} ${stageRes}"        
+        slackSend (channel: mySlackChannel, color: colorCode, message: msg)
+    } else {
+        color = 'RED'
+        colorCode = '#FF0000'
+        stageRes = 'failed'
+        msg = "${subject} ${stageRes}"        
+        slackSend (channel: mySlackChannel, color: colorCode, message: msg)
+    }
+
+}

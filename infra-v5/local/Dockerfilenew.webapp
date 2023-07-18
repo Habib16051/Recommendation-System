@@ -1,0 +1,59 @@
+FROM python:3.7-alpine as base
+# to save space install compilers in builder stage
+FROM base as builder
+RUN mkdir /envwebsite
+
+ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
+
+RUN apk add --update \
+  build-base \
+  cairo \
+  cairo-dev \
+  cargo \
+  freetype-dev \
+  gcc \
+  gdk-pixbuf-dev \
+  gettext \
+  jpeg-dev \
+  lcms2-dev \
+  libffi-dev \
+  musl-dev \
+  openjpeg-dev \
+  openssl-dev \
+  pango-dev \
+  poppler-utils \
+  --no-cache postgresql-client \
+  postgresql-dev \
+  py-cffi \
+  python3-dev \
+  rust \
+  tcl-dev \
+  tiff-dev \
+  tk-dev \
+  zlib-dev
+
+
+WORKDIR /envwebsite
+COPY requirements.txt /requirements.txt
+RUN pip install --upgrade pip \
+    && pip install --prefix=/envwebsite -r /requirements.txt
+
+FROM base
+COPY --from=builder /envwebsite /usr/local
+RUN apk --no-cache add libpq postgresql-client
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV MEDIA_ROOT    /data/media
+ENV STATIC_ROOT   /data/static
+ENV LOG_DIRECTORY /data/log
+ENV STATIC_URL    /static/
+
+EXPOSE 7070
+COPY websitev5 websitev5
+RUN mkdir -p /data/static /data/media /data/log
+
+WORKDIR /websitev5
+RUN python manage.py collectstatic --no-input
+# COPY /websitev5/static /data/static
+VOLUME ["/data/static", "/data/media", "/data/log"]

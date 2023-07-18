@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zxx">
+<head>
+	{% load static %}
+
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Lego IO</title>
+    <link href="https://fonts.googleapis.com/css?family=Comfortaa:400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet">
+
+	<link rel="icon" href="{% static 'img/favicon.png' %}">
+	<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+	<link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+	<link rel="stylesheet" href="{% static 'css/owl.carousel.css' %}">
+	<link rel="stylesheet" href="{% static 'css/owl.theme.css' %}">
+	<link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+	<link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+	<link rel="stylesheet" href="{% static 'css/fakeLoader.css' %}">
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+	<!-- loader -->
+	<div id="fakeLoader"></div>
+	<!-- end loader -->
+	
+	<!-- header -->
+	<header>
+		<!-- navbar -->
+		<nav class="navbar navbar-default navbar-fixed-top navbar-ng">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-navbar">
+						<span class="sr-only"></span>
+						<i class="fa fa-bars"></i>
+					</button>
+					<a href="{% url 'home' %}" class="navbar-brand"><h1>LEGOIO</h1></a>
+				</div>
+				<div class="collapse navbar-collapse n-link" id="bs-navbar">
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="#home"></a></li>
+						<li><a href="#work">OUR SERVICES</a></li>
+						<li><a href="#features">TECHS WE USE</a></li>
+						<li><a href="#contact">CONTACT US</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<!-- end navbar -->
+
+		<!-- slider -->
+		<div id="home" class="slider">
+			<div id="slider-home" class="owl-carousel owl-theme">
+				<div class="item">
+					<img src="{% static 'img/slide1.jpg' %}" alt="">
+					<div class="mask"></div>
+					<div class="caption">
+						<h2>WELCOME TO LEGOIO IT</h2>
+						<h6>Where Requisitions Meet Resolve </h6>
+					<!--	<button type="button" class="button-default"> LEARN MORE</button>	-->
+					</div>
+				</div>
+				<div class="item">
+					<img src="{% static 'img/slide2.jpg' %}" alt="">
+					<div class="mask"></div>
+					<div class="caption">
+						<h2>THE BRAINS BEHIND THE NAMES</h2>
+						<h6>Who Aspire To Perceive </h6>
+					<!--	<button type="button" class="button-default"> LEARN MORE</button>	-->
+					</div>
+				</div>
+				<div class="item">
+					<img src="{% static 'img/slide3.jpg' %}" alt="">
+					<div class="mask"></div>
+					<div class="caption">
+						<h2>UNCOMPROMISING AT QUALITY</h2>
+						<h6>Which Construes True Caliber</h6>
+					<!--	<button type="button" class="button-default"> LEARN MORE</button>	-->
+					</div>
+				</div>
+
+			
+
+				
+
+				
+			</div>
+		</div>
+		<!-- end slider -->
+
+	</header>
+	<!-- end header -->
+
+
+
+	<!-- work -->
+	<div id="work" class="work section">
+
+		<div class="section-title">
+			<h3><b>OUR SERVICES</b></h3>
+		</div>
+
+		<div class="container">
+
+				<div class="filtr-container">
+
+					<div class="row work-filter">
+						<div class="col-md-4 col-sm-4 col-xs-12 filtr-item" data-category="1, 3">
+
+						</div>
+					</div>
+				</div>
+
+			<div id="about" class="about section">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-6 col-sm-6 col-xs-12">
+							<div class="content-image">
+								<img src="{% static 'img/work1.jpg' %}" alt="">
+							</div>
+						</div>
+						<div class="col-md-6 col-sm-6 col-xs-12">
+							<div class="content-text">
+								<h2>Web App Development</h2>
+								<p><h6>LegoIO aspires in developing enterprise level web applications 
+									for usage by the average consumers and client-base with requisitions 
+									of instantaneous solutions at minimal pricing and bring solution to the 
+									problems impromptu. With real-time research of the market and the proposed 
+									solutions in national and global scale for over a period of 3 years, we aim 
+									to deliver a state-of-the-art web application systems that are not only easy 
+									to implement, but also intuitive to the users.</h6></p>
+								<!--<button type="button" class="button-default">Read More</button>
+								<p>Appstore</p>
+								<p>Google playstore</p>
+								-->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="container">
+
+			<div class="filtr-container">
+
+				<div class="row work-filter">
+					<div class="col-md-4 col-sm-4 col-xs-12 filtr-item" data-category="1, 3">
+
+					</div>
+				</div>
+			</div>
+
+		<div id="about" class="about section">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-6 col-sm-6 col-xs-12">
+						<div class="content-image">
+							<img src="{% static 'img/work1.jpg' %}" alt="">
+						</div>
+					</div>
+					<div class="col-md-6 col-sm-6 col-xs-12">
+						<div class="content-text">
+							<h2>Mobile App Development</h2>
+							<p><h6>With support for mobile applications in both Android and IOs platforms, 
+								LegoIO ensures accessibility from global user perspective and make the services 
+								available for the targeted audience as well as the additional users for maximum 
+								usage of the services, thereby maximizing revenue and goodwill. This also helps 
+								to generate new perspective for new features and enhance the development procedure 
+								for innovation towards a wider aspect of users from different conventions with 
+								different demands.</h6></p>
+							<!--<button type="button" class="button-default">Read More</button>
+							<p>Appstore</p>
+							<p>Google playstore</p>
+							-->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+		<div class="container">
+			<div id="about" class="about section">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-6 col-sm-6 col-xs-12">
+					<div class="content-image">
+						<img src="{% static 'img/work2.jpg' %}" alt="">
+					</div>
+				</div>
+				<div class="col-md-6 col-sm-6 col-xs-12">
+					<div class="content-text">
+						<h2>Software Testing</h2>
+						<h6><p>With the mind-set of providing enterprise level services,
+							 LegoIO takes Quality Assurance to the utmost priority with extreme 
+							 apathy towards versatile environment, taking all available measures 
+							 to enhance the quality of service experienced by the client users.</p></h6>
+						<!-- <button type="button" class="button-default">Read More</button> -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+		</div>
+
+		
+		<div class="container">
+			<div id="about" class="about section">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-6 col-sm-6 col-xs-12">
+							<div class="content-image">
+								<img src="{% static 'img/work3.jpg' %}" alt="">
+							</div>
+						</div>
+						<div class="col-md-6 col-sm-6 col-xs-12">
+							<div class="content-text">
+								<h2>Cloud Services</h2>
+								<h6><p>With support for mobile applications in both Android and IOs platforms, 
+									LegoIO ensures accessibility from global user perspective and make the services available 
+									for the targeted audience as well as the additional users for maximum usage of the services, 
+									thereby maximizing revenue and goodwill. This also helps to generate new perspective for new 
+									features and enhance the development procedure for innovation towards a wider aspect of users 
+									from different conventions with different demands. </p></h6>
+								<!--<button type="button" class="button-default">Read More</button>  -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div id="about" class="about section">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-6 col-sm-6 col-xs-12">
+					<div class="content-image">
+						<img src="{% static 'img/work4.jpg' %}" alt="">
+					</div>
+				</div>
+						<div class="col-md-6 col-sm-6 col-xs-12">
+							<div class="content-text">
+								<h2>Database Management</h2>
+								<h6><p>With the mind-set of providing enterprise level services, 
+									LegoIO takes Quality Assurance to the utmost priority with extreme 
+									apathy towards versatile environment, taking all available measures 
+									to enhance the quality of service experienced by the client users.</p></h6>
+							<!--	<button type="button" class="button-default">Read More</button>
+								<p>Appstore</p>
+								<p>Google playstore</p>		-->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="container">
+			<div id="about" class="about section">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-6 col-sm-6 col-xs-12">
+					<div class="content-image">
+						<img src="{% static 'img/work4.jpg' %}" alt="">
+					</div>
+				</div>
+						<div class="col-md-6 col-sm-6 col-xs-12">
+							<div class="content-text">
+								<h2>IT Consultancy</h2>
+								<h6><p>LegoIO also provides standard and effective IT support to the client users through 
+									the synergy amongst the deployment, DevOps and system admins, increasing 
+									communication between the individual sectors, as well as the members working 
+									behind them. This facilitates for major updates, mitigates drastic changes and 
+									assists with response to the customer demand in the products, thereby endorsing 
+									maximum revenue at the shortest of efforts.</p></h6>
+							<!--	<button type="button" class="button-default">Read More</button>
+								<p>Appstore</p>
+								<p>Google playstore</p>		-->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+	</div>
+	<!-- end work -->
+
+
+
+
+<!-- features/TECHS WE USE -->
+	<div id="features" class="features section bg-second">
+		<div class="container">
+			<div class="section-title">
+				<h3>TECHS WE USE</h3>
+			</div>
+			<div class="row">
+				<div class="col-md-3 col-sm-6 col-xs-12">
+					<div class="content">
+
+						<h4>Programming Languages</h4>
+						<p><b>Java,Python,JavaScript,SQL</b></p>
+						<p>Incorporating the most popular open source sets
+							of programming languages</p>
+
+					</div>
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-12">
+					<div class="content">
+						<h4>Application Deployment</h4>
+						<p><b>Jenkins, Ansible</b></p>
+						<p>Deployment at the hands of the most
+							capable DevOps software</p>
+					</div>
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-12">
+					<div class="content">
+
+						<h4>Cloud Technologies</h4>
+						<p><b>AWS, Google cloud</b></p>
+						<p>Best names in the business for trustworthy
+							services and security</p>
+					</div>
+				</div>
+
+				<div class="col-md-3 col-sm-6 col-xs-12">
+					<div class="content">
+
+						<h4>Software Testing</h4>
+						<p><b>JMeter, Selenium</b></p>
+						<p>Taken to their limits for maximum user
+							engagement and reliable user handling</p>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<!-- end features -->
+
+
+
+
+	<!-- contact -->
+	<div id="contact" class="contact section py-5">
+		<div class="container">
+			<div class="section-title">
+
+				<h3>CONTACT US</h3>
+			</div>
+			<form method="POST" action="{% url 'contact' %}">
+				{% csrf_token %}
+				<div class="row">
+					<div class="col-md-6 col-sm-6">
+						<div class="content">
+							<input type="text" name='name' placeholder="Name">
+						</div>
+					</div>
+					<div class="col-md-6 col-sm-6">
+						<div class="content">
+							<input type="email" name='email' placeholder="Email">
+						</div>
+					</div>
+					<div class="col-md-12 col-sm-12">
+						<div class="content">
+							<input type="text" name='subject' placeholder="Subject">
+						</div>
+					</div>
+					<div class="col-md-12 col-sm-12">
+						<div class="content">
+							<textarea cols="30" rows="10" name="message" placeholder="Message"></textarea>
+							<div class="content">
+								<div class="content">
+									<button type="submit" class="button-default">Submit</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<!-- end contact -->
+
+	<!-- footer -->
+	<footer>
+		<div class="container">
+			<div class="footer-content">
+				<p>What is LegoIO?</p>
+ 				<p>An American software startup, specializing in
+					Web Application and Machine Learning Application
+					Development that aims to solve and serve real life problems</p>
+			</div>
+			<div class="footer-copyright">
+				<p></p>
+			</div>
+		</div>
+	</footer>
+	<!-- end footer -->
+
+
+
+	<!-- script -->
+	<script src="{% static 'js/jquery.min.js'%}"></script>
+	<script src="{% static 'js/bootstrap.min.js'%}"></script>
+	<script src="{% static 'js/owl.carousel.min.js'%}"></script>
+	<script src="{% static 'js/jquery.scrollToTop.min.js'%}"></script>
+	<script src="{% static 'js/jquery.magnific-popup.min.js'%}"></script>
+	<script src="{% static 'js/jquery.filterizr.min.js'%}"></script>
+	<script src="{% static 'js/fakeLoader.js'%}"></script>
+	<script src="{% static 'js/numscroller-1.0.js'%}"></script>
+	<script src="{% static 'js/main.js'%}"></script>
+
+
+
+</body>
+</html>

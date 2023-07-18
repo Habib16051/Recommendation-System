@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  webapp019:
+    image: legoiowebsite/production/webapp:$GIT_COMMIT
+    ports:
+      - "7070:7070"
+    env_file:
+      - ../../.env
+  webserver019:
+    image: legoiowebsite/production/webserver:$GIT_COMMIT
+    depends_on: 
+      - webapp019
+    container_name: "websiteserver"
+    network_mode: "service:webapp019"

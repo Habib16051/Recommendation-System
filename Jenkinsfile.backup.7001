@@ -1,0 +1,235 @@
+pipeline {
+    agent any
+    options {
+        ansiColor('xterm')
+    }    
+    environment {
+        AWS_ACCOUNT_ID     = "700158924566"
+        AWS_DEFAULT_REGION = "us-east-1" 
+        ECR_REPO_NAME      = "legoiowebsite/prod/legoweb-app"
+        DOCKER_IMG_NAME    = "legoiowebsite/prod/legoweb-app"
+        IMAGE_TAG          = "latest"
+        REPOSITORY_URI     = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPO_NAME}"
+
+
+    }
+   
+    stages {
+        
+        // clonning git repo
+        stage('Cloning Git') {
+            steps {
+                checkout scm
+                script {
+                    env.GIT_COMMIT = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+
+                }
+
+            }
+        }
+
+
+
+        // checking values for ENV file
+        stage('check ENV_var') {
+
+            steps {
+                script {
+
+                    // prepare application configuratoin
+                    sh """
+                    CONFIG_PARAMETERS=\$(aws ssm  get-parameters-by-path \
+                      --path "/legoiowebsite-prod/" \
+                      --query "Parameters[*].Name" \
+                      --region us-east-1 \
+                      --output text)
+
+                    for config in \$CONFIG_PARAMETERS; do
+                        env_value=\$(aws ssm get-parameter \
+                            --name "\$config" \
+                            --query "Parameter.Value" \
+                            --region us-east-1 \
+                            --output text)
+                        env_name=\${config##/*/}
+
+                       echo "\${env_name}=\${env_value}"
+                    done
+                    """                    
+
+                }
+            }
+
+        }
+
+  
+        // building Docker images
+        stage('Building Docker image') {
+            steps{
+                script {
+                    // To delete volumes currently not being used by a running or stopped container
+                    sh "docker system prune --all --force --volumes"
+                    sh "docker build -t ${DOCKER_IMG_NAME}:${IMAGE_TAG} -f infra-v4/prod/Dockerfile.webapp --no-cache ."
+                    sh "docker images --filter label=project=legoiowebsitev4:latest"
+                    sh "echo inspecting docker img -> legoiowebsitev4:latest"
+                    sh "docker image inspect legoiowebsite/prod/legoweb-app:latest"
+
+                }
+            }
+        }
+
+
+
+        // performing database migrations
+        stage('databse migrations') {
+            steps{
+                script {
+
+                    String username_fname = 'admin'
+                    String username_lname = new Date().format("yyyyMMddHHmmss")
+                    String dynamicUsername = username_fname + username_lname
+                    
+                    // prepare application configuratoin
+                    sh """
+                        set +x
+                        DOCKER_EVN_FILE=.env
+                        CONFIG_PARAMETERS=\$(aws ssm  get-parameters-by-path \
+                          --path "/legoiowebsite-prod/" \
+                          --query "Parameters[*].Name" \
+                          --region us-east-1 \
+                          --output text)
+
+                        for config in \$CONFIG_PARAMETERS; do
+                           env_value=\$(aws ssm get-parameter \
+                            --name "\$config" \
+                            --query "Parameter.Value" \
+                            --with-decryption  \
+                            --region us-east-1 \
+                            --output text)
+                            env_name=\${config##/*/}
+
+                           echo "\${env_name}=\${env_value}" >> \${DOCKER_EVN_FILE}
+                        done
+                        set -x
+                    """
+                    
+                    // -- setup docker-compose
+                    sh """curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-\$(uname -s)-\$(uname -m)" -o docker-compose"""
+                    sh "chmod +x docker-compose"
+                    sh "./docker-compose -f infra-v4/prod/docker-compose.yml up --remove-orphans -d"
+                    sh "./docker-compose -f infra-v4/prod/docker-compose.yml config"
+                    sh "docker container ls"
+                    sh "docker ps -a"
+                    sh "docker logs prod_webapp_1"
+
+
+                    // --- starting db migration commands
+                    sh "./docker-compose -f infra-v4/prod/docker-compose.yml exec -T webapp python manage.py showmigrations"
+                    sh "./docker-compose -f infra-v4/prod/docker-compose.yml exec -T webapp python manage.py makemigrations"
+                    sh "./docker-compose -f infra-v4/prod/docker-compose.yml exec -T webapp python manage.py migrate"
+                    sh "./docker-compose -f infra-v4/prod/docker-compose.yml exec -T webapp python manage.py showmigrations"
+                    // --- check for critial issues
+                    sh "./docker-compose -f infra-v4/prod/docker-compose.yml exec -T webapp python manage.py check --deploy"
+                    // --- create superuser username=someusername
+                    // sh "./docker-compose -f infra-v4/prod/docker-compose.yml exec -T webapp python manage.py create_superuser_command2 --username ${dynamicUsername} --noinput"
+                    
+                    // --- inspect docker containers
+                    sh "docker ps"                    
+                    sh "docker ps -a"
+
+
+                }
+            }
+        }
+
+
+        // uploading Docker images into AWS ECR
+        stage('build & push docker img') {
+            steps {  
+                    script {
+                        sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+                        sh "docker tag ${DOCKER_IMG_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}:$IMAGE_TAG"
+                        sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
+
+
+                        //////////// check ecr repo to see if image was pushed successfully
+                        // sh "aws ecr describe-repositories --query 'repositories[].[repositoryName, repositoryUri]' --region us-east-1"
+                        sh "aws ecr list-images --repository-name ${ECR_REPO_NAME} --region us-east-1"
+
+
+                    }
+
+            }
+        }
+
+
+
+        // running container through ECS
+        stage('run ECS service') {
+            steps {
+                    dir('infra-v4/prod/ecsdjango') {
+                        script {
+                            sh """
+                                pwd
+                                rm -rf terraform
+                                curl https://releases.hashicorp.com/terraform/1.2.7/terraform_1.2.7_linux_amd64.zip \
+                                --output terraform_1.2.7_darwin_amd64.zip \
+                                && unzip terraform_1.2.7_darwin_amd64.zip 
+
+                                ./terraform init
+                                ./terraform plan  --var-file=config/test.tfvars
+                                ./terraform apply --var-file=config/test.tfvars -auto-approve
+                            """
+
+
+                            sh """
+                                aws ecs update-service \
+                                --cluster ecsdjango \
+                                --service demosvc \
+                                --force-new-deployment \
+                                --region us-east-1
+                            """
+
+
+                            sh "echo this is a test"
+
+                        }   
+                    }
+            }
+        }
+
+    }
+
+}
+
+
+
+
+// def notifyBuild(String buildStatus = 'STARTED') {
+//     // build status of null means successful
+//     buildStatus =  buildStatus ?: 'SUCCESSFUL'
+
+//     // Default values
+//     def mySlackChannel = "#devops-general"
+//     def colorName = 'RED'
+//     def colorCode = '#FF0000'
+//     def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+//     def summary = "${subject} (${env.BUILD_URL})"
+//     def details = """<p>STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+//     <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>"""
+
+//     // Override default values based on build status
+//     if (buildStatus == 'STARTED') {
+//         color = 'YELLOW'
+//         colorCode = '#FFFF00'
+//     } else if (buildStatus == 'SUCCESSFUL') {
+//         color = 'GREEN'
+//         colorCode = '#00FF00'
+//     } else {
+//         color = 'RED'
+//         colorCode = '#FF0000'
+//     }
+
+//     // Send notifications
+//     // slackSend (channel: '@me', color: colorCode, message: summary)
+//     slackSend channel: mySlackChannel, message: summary
+// }

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+	{% load static %}
+
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Lego IO - Press Release</title>
+	<link href="https://fonts.googleapis.com/css?family=Comfortaa:400,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+	<link rel="icon" href="{% static 'img/favicon.png' %}">
+	<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+	<link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+	<link rel="stylesheet" href="{% static 'css/owl.carousel.css' %}">
+	<link rel="stylesheet" href="{% static 'css/owl.theme.css' %}">
+	<link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+	<link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+	<link rel="stylesheet" href="{% static 'css/fakeLoader.css' %}">
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-79HZG3FPX3"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+		gtag('config', 'G-79HZG3FPX3');
+	</script>
+</head>
+<body>
+
+	<!-- loader -->
+	<div id="fakeLoader"></div>
+	<!-- end loader -->
+
+	<!-- header -->
+	<header>
+		<!-- navbar -->
+		<nav class="navbar navbar-default navbar-ng" style="background-color: #222985;">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+						data-target="#bs-navbar">
+						<span class="sr-only"></span>
+						<i class="fa fa-bars"></i>
+					</button>
+					<a href="{% url 'home' %}" class="navbar-brand">
+						<h1>LEGOIO</h1>
+					</a>
+				</div>
+				<div class="collapse navbar-collapse n-link" id="bs-navbar">
+					<ul class="nav navbar-nav navbar-right">
+						<li><a class="navitem" href="#our-services">OUR SERVICES</a></li>
+						<li><a class="navitem" href="#tech-we-use">TECHS WE USE</a></li>
+						<li><a class="navitem" href="#contact-us">CONTACT US</a></li>
+						<li><a href="{% url 'press' %}">PRESS RELEASE</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<!-- end navbar -->
+	</header>
+	<!-- end header -->
+
+	<!-- work -->
+	<div id="" class="work section">
+		<div class="container">
+			<div class="filtr-container">
+				<div class="row work-filter">
+					<div class="col-md-4 col-sm-4 col-xs-12 filtr-item" data-category="1, 3">
+
+					</div>
+				</div>
+			</div>	
+		</div>		
+	</div>
+	<!-- end work -->
+
+    <section id="blog" class="py-5" style="margin-bottom: 50px;">
+        <div class="container">
+            <div class="row">
+                <h3 class="text-center" style="margin-bottom: 50px;"><b>PRESS RELEASE</b></h3>
+                <div class="col-md-4">
+                    <div class="card-columns">
+                        <div class="card">
+                            <img src="{% static 'img/image1.jpeg' %}" class="img-fluid card-img-top" style="width: 100%; border-radius: 5px;" alt="">
+                            <div class="card-body" style=" border: 1px solid #dcdcdc; padding: 10px; border-radius: 5px;">
+                                <h4 style="margin-top: 30px;">Blog Post One</h4>
+                                <small class="text-muted">Written By Demo</small>
+                                <hr>
+                                <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure non eveniet recusandae minus nesciunt commodi hic consequatur quo officiis quos.</p>
+                                <a href="#" class="btn btn-primary btn-block">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-columns">
+                        <div class="card">
+                            <img src="{% static 'img/image2.jpeg' %}" class="img-fluid card-img-top" style="width: 100%; border-radius: 5px;" alt="">
+                            <div class="card-body" style=" border: 1px solid #dcdcdc; padding: 10px; border-radius: 5px;">
+                                <h4 style="margin-top: 30px;">Blog Post Two</h4>
+                                <small class="text-muted">Written By Demo</small>
+                                <hr>
+                                <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure non eveniet recusandae minus nesciunt commodi hic consequatur quo officiis quos.</p>
+                                <a href="#" class="btn btn-primary btn-block">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-columns">
+                        <div class="card">
+                            <img src="{% static 'img/image3.jpeg' %}" class="img-fluid card-img-top" style="width: 100%; border-radius: 5px;" alt="">
+                            <div class="card-body" style=" border: 1px solid #dcdcdc; padding: 10px; border-radius: 5px;">
+                                <h4 style="margin-top: 30px;">Blog Post Three</h4>
+                                <small class="text-muted">Written By Demo</small>
+                                <hr>
+                                <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iure non eveniet recusandae minus nesciunt commodi hic consequatur quo officiis quos.</p>
+                                <a href="#" class="btn btn-primary btn-block">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+	<!--Footer Start-->
+	<div class="contain bg-dark">
+        {% include 'footer.html' %}
+    </div>
+	<!--Footer End-->
+
+	<!-- script -->
+	<script src="{% static 'js/jquery.min.js'%}"></script>
+	<script src="{% static 'js/bootstrap.min.js'%}"></script>
+	<script src="{% static 'js/owl.carousel.min.js'%}"></script>
+	<script src="{% static 'js/jquery.scrollToTop.min.js'%}"></script>
+	<script src="{% static 'js/jquery.magnific-popup.min.js'%}"></script>
+	<script src="{% static 'js/jquery.filterizr.min.js'%}"></script>
+	<script src="{% static 'js/fakeLoader.js'%}"></script>
+	<script src="{% static 'js/numscroller-1.0.js'%}"></script>
+	<script src="{% static 'js/main.js'%}"></script>
+</body>
+</html>

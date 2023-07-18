@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+    webapp019:
+        build:
+            context: ../../
+            dockerfile: infra-v5/local/Dockerfile.webapp
+        command: >
+            sh -c "pwd && ls &&
+            python manage.py showmigrations &&
+            python manage.py makemigrations &&
+            python manage.py migrate &&
+            gunicorn websitev5.wsgi --bind 0.0.0.0:7070"
+        volumes:
+            - website-media:/data/media
+            - website-static:/data/static
+            - website-log:/data/log
+        env_file:
+            - ../../.env
+        ports:
+            - "7070:7070"
+    webserver019:
+        image: nginx:latest
+        volumes:
+            - website-media:/data/media
+            - website-static:/data/static
+            - website-log:/data/log
+            - ./nginx.conf:/etc/nginx/nginx.conf            
+        ports:
+            - "80:80"
+
+
+volumes:
+    website-media:
+    website-static:
+    website-log:

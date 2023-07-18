@@ -1,0 +1,58 @@
+FROM python:3.7-alpine AS build
+
+RUN apk add --update \
+  build-base \
+  cairo \
+  cairo-dev \
+  cargo \
+  freetype-dev \
+  gcc \
+  gdk-pixbuf-dev \
+  gettext \
+  jpeg-dev \
+  lcms2-dev \
+  libffi-dev \
+  musl-dev \
+  openjpeg-dev \
+  openssl-dev \
+  pango-dev \
+  poppler-utils \
+  postgresql-client \
+  postgresql-dev \
+  py-cffi \
+  python3-dev \
+  rust \
+  tcl-dev \
+  tiff-dev \
+  tk-dev \
+  zlib-dev
+
+COPY ./requirements.txt .
+
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+ENV MEDIA_ROOT    /data/media
+ENV STATIC_ROOT   /data/static
+ENV LOG_DIRECTORY /data/log
+ENV STATIC_URL    /static/
+
+COPY websitev5 websitev5
+RUN mkdir -p /data/static /data/media /data/log
+
+WORKDIR /websitev5
+# RUN export STATIC_ROOT=/data/static
+RUN python manage.py collectstatic --no-input
+
+# NGINX
+FROM nginx:latest
+EXPOSE 80
+
+COPY ./infra-v5/production/nginx.conf /etc/nginx/nginx.conf
+# Copy static files
+COPY --from=build /data/static /data/static
+COPY --from=build /data/media /data/media
+RUN chown -R nginx:nginx /data
